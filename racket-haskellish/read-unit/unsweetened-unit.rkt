@@ -6,7 +6,7 @@
          syntax/parse
          sweet-exp/read-sig
          sweet-exp/util
-         "../operator-symbol.rkt"
+         "../util/operator-symbol.rkt"
          )
 
 (import (rename read^

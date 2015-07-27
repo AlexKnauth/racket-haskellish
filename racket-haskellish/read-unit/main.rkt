@@ -10,7 +10,7 @@ require racket/unit
           read -read
           read-syntax -read-syntax
         sweet-exp/sugar
-        "../unit-util.rkt"
+        "../util/unit-util.rkt"
         "unsweetened-unit.rkt"
 module+ test
   require rackunit

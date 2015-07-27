@@ -44,7 +44,7 @@ require
           rename_in syntax/parse
             id id_op
             expr expr_op
-          "operator-symbol.rkt"
+          "util/operator-symbol.rkt"
 
 begin_for_syntax
   define-syntax-class op
