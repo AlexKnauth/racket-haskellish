@@ -144,46 +144,46 @@ chk take 12 (cycle "LOL ") = "LOL LOL LOL "
 chk take 10 (repeat 5) = [5,5,5,5,5,5,5,5,5,5]
 chk replicate 3 10 = [10,10,10]
 ;; I'm a list compression
-[x*2 | x <- [1..10]]
-[x*2 | x <- [1..10], (x*2) >= 12] ; should be [12,14,16,18,20]
-[ x | x <- [50..100], (x `mod` 7) == 3] ; should be [52,59,66,73,80,87,94]
+chk [x*2 | x <- [1..10]] = [2,4,6,8,10,12,14,16,18,20]
+chk [x*2 | x <- [1..10], (x*2) >= 12] =  [12,14,16,18,20]
+chk [ x | x <- [50..100], (x `mod` 7) == 3] = [52,59,66,73,80,87,94]
 def boomBangs xs = [ if x < 10 then "BOOM!" else "BANG!" | x <- xs, odd x]
-boomBangs [7..13] ; should be ["BOOM!","BOOM!","BANG!","BANG!"]
-[ x | x <- [10..20], x /= 13, x /= 15, x /= 19] ; should be [10,11,12,14,16,17,18,20]
-[ x*y | x <- [2,5,10], y <- [8,10,11]] ; should be [16,20,22,40,50,55,80,100,110]
-[ x*y | x <- [2,5,10], y <- [8,10,11], (x*y) > 50] ; should be [55,80,100,110]
+chk boomBangs [7..13] = ["BOOM!","BOOM!","BANG!","BANG!"]
+chk [ x | x <- [10..20], x /= 13, x /= 15, x /= 19] = [10,11,12,14,16,17,18,20]
+chk [ x*y | x <- [2,5,10], y <- [8,10,11]] = [16,20,22,40,50,55,80,100,110]
+chk [ x*y | x <- [2,5,10], y <- [8,10,11], (x*y) > 50] = [55,80,100,110]
 def nouns = ["hobo","frog","pope"]  
 def adjectives = ["lazy","grouchy","scheming"]  
-;[adjective ++ (" " ++ noun) | adjective <- adjectives, noun <- nouns]
-; should be:
-;["lazy hobo","lazy frog","lazy pope","grouchy hobo","grouchy frog",  
-;"grouchy pope","scheming hobo","scheming frog","scheming pope"]
+chk map (map (\x->x)) [adjective ++ (" " ++ noun) | adjective <- adjectives, noun <- nouns]
+  =
+  ["lazy hobo","lazy frog","lazy pope","grouchy hobo","grouchy frog",  
+   "grouchy pope","scheming hobo","scheming frog","scheming pope"]
 def length' xs = sum [1 | _ <- xs]
 ;def removeNonUppercase st = [ c | c <- st, c `elem` ['A'..'Z']]
 ;removeNonUppercase "Hahaha! Ahahaha!" ; should be "HA"  
 ;removeNonUppercase "IdontLIKEFROGS" ; should be "ILIKEFROGS"
 def xxs = [[1,3,5,2,3,1,2,4,5],[1,2,3,4,5,6,7,8,9],[1,2,4,2,1,6,3,1,3,2,3,6]]  
-[ [ x | x <- xs, even x ] | xs <- xxs] ; should be [[2,2,4],[2,4,6,8],[2,4,2,6,2,6]]
+chk [ [ x | x <- xs, even x ] | xs <- xxs] = [[2,2,4],[2,4,6,8],[2,4,2,6,2,6]]
 ;; Tuples
-(1, 3)
-(3, 'a', "hello")
-(50, 50.4, "hello", 'b')
+chk (1, 3) = (1, 3)
+chk (3, 'a', "hello") = (3, 'a', "hello")
+chk (50, 50.4, "hello", 'b') = (50, 50.4, "hello", 'b')
 ;; Using Tuples
-[[1,2],[8,11],[4,5]]
-[[1,2],[8,11,5],[4,5]] ; probably not what you wanted
-[(1,2),(8,11),(4,5)]
-("Christopher", "Walken", 55)
+chk [[1,2],[8,11],[4,5]] = [[1,2],[8,11],[4,5]]
+chk [[1,2],[8,11,5],[4,5]] = [[1,2],[8,11,5],[4,5]] ; probably not what you wanted
+chk [(1,2),(8,11),(4,5)] = [(1,2),(8,11),(4,5)]
+chk ("Christopher", "Walken", 55) = ("Christopher", "Walken", 55)
 ;TODO implement generic <
 ;(3,2,1) < (3,2,2)
 ;; Using Pairs
-fst (8, 11)
-fst ("Wow", False)
-snd (8, 11)
-snd ("Wow", False)
-zip [1,2,3,4,4] [5,5,5,5,5]
-zip [1..5] ["one","two","three","four","five"]
-zip [5,3,2,6,2,7,2,5,4,6,6] ["im","a","turtle"]
-zip [1..] ["apple","orange","cherry","mango"]
+chk fst (8, 11) = 8
+chk fst ("Wow", False) = "Wow"
+chk snd (8, 11) = 11
+chk snd ("Wow", False) = False
+chk zip [1,2,3,4,5] [5,5,5,5,5] = [(1,5),(2,5),(3,5),(4,5),(5,5)]
+chk zip [1..5] ["one","two","three","four","five"] = [(1,"one"),(2,"two"),(3,"three"),(4,"four"),(5,"five")]
+chk zip [5,3,2,6,2,7,2,5,4,6,6] ["im","a","turtle"] = [(5,"im"),(3,"a"),(2,"turtle")]
+chk zip [1..] ["apple","orange","cherry","mango"] = [(1,"apple"),(2,"orange"),(3,"cherry"),(4,"mango")]
 ;; Finding the Right Triangle
 def triples = [(a,b,c) | c <- [1..10], a <- [1..10], b <- [1..10]]
 def triples' = [(a,b,c) | c <- [1..10], a <- [1..c], b <- [1..a]]
@@ -192,5 +192,5 @@ def rightTriangles = [(a,b,c) | c <- [1..10], a <- [1..c], b <- [1..a],
 def rightTriangles' = [(a,b,c) | c <- [1..10], a <- [1..c], b <- [1..a],
                                  ((a^2) + (b^2)) == (c^2),
                                  ((a+b)+c) == 24]
-rightTriangles'
+chk rightTriangles' = [(8,6,10)]
 
