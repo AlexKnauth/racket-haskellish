@@ -1,5 +1,7 @@
 #lang sweet-exp racket/base
 
+provide make
+
 require "multiple-inheritance-struct.rkt"
         for-syntax racket/base
                    syntax/id-table
