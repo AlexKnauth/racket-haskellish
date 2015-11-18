@@ -1,6 +1,10 @@
 #lang sweet-exp racket/base
 
 provide define-struct
+        for-syntax struct-id
+                   struct-info-constructor-id
+                   struct-info-supers
+                   struct-info-fields
 
 require racket/bool
         racket/unsafe/ops
@@ -15,21 +19,37 @@ module+ test
 
 
 begin-for-syntax
-  struct struct-info (prop-id) ; opaque
-  define (make-struct-info #:prop-id prop-id)
-    struct-info prop-id
+  struct struct-info (name constructor-id prop-id supers fields) ; opaque
+  ;; a Struct-Info is
+  ;; (make-struct-info #:name Symbol
+  ;;                   #:constructor-id Identifier
+  ;;                   #:prop-id Identifier
+  ;;                   #:supers (Listof Struct-Info)
+  ;;                   #:fields (Listof (Cons Symbol Identifier)))
+  ;; supers is an ordered list containing the struct-infos of the super-structs
+  ;; fields is an ordered association list mapping the field names to the accessors, in order
+  define (make-struct-info #:name name
+                           #:constructor-id constructor-id
+                           #:prop-id prop-id
+                           #:supers supers
+                           #:fields fields)
+    struct-info name constructor-id prop-id supers fields
   define-syntax-class struct-id
-    #:attributes (info prop-id)
+    #:attributes (info)
     pattern s:id
       #:attr info
       syntax-local-value #'s (lambda () #f)
-      #:when (attribute info)
+      #:when (struct-info? (attribute info))
+  define-syntax-class private-struct-id
+    #:attributes (info prop-id)
+    pattern :struct-id
       #:with prop-id:id
       syntax-property
         struct-info-prop-id (attribute info)
         'disappeared-use
         list
           syntax-local-introduce #'s
+
 
 define-syntax define-struct
   syntax-parser
@@ -38,7 +58,7 @@ define-syntax define-struct
       syntax
         define-struct s #:extends [] (field ...)
     group
-      define-struct s:id #:extends [super:struct-id ...] (field:id ...)
+      define-struct s:id #:extends [super:private-struct-id ...] (field:id ...)
       #:with [s-field ...]
       for/list ([field (in-list (syntax->list #'[field ...]))])
         format-id #'s "~a-~a" #'s field #:source field #:props #'s
@@ -64,8 +84,6 @@ define-syntax define-struct
                 cons super.prop-id
                   lambda (x) 'super-i
                 ...
-          define-syntax s
-            make-struct-info #:prop-id #'prop-s
           struct s-struct (super ... field ...)
             #:property prop-s
             #f
@@ -73,6 +91,16 @@ define-syntax define-struct
             s-struct super ... field ...
           define-accessor s-field get-s-prop field-i
           ...
+          define-syntax s
+            make-struct-info #:name 's
+                             #:constructor-id #'make-s
+                             #:prop-id #'prop-s
+                             #:supers list
+                                        (syntax-local-value #'super)
+                                        ...
+                             #:fields list
+                                        cons 'field #'s-field
+                                        ...
 
 
 define-simple-macro
