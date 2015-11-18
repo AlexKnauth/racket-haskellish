@@ -2,6 +2,7 @@
 
 provide define-struct
         for-syntax struct-id
+                   struct-info-name
                    struct-info-constructor-id
                    struct-info-supers
                    struct-info-fields
