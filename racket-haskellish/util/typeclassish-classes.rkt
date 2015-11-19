@@ -28,7 +28,8 @@ instance (Eq EqNumber) where
       (not ((== EqNumber) a b))
 
 instance (Ord OrdNumber) where
-  #:super Eq EqNumber
+  == = (== EqNumber)
+  /= = (/= EqNumber)
   compare =
     lambda (a b)
       cond
@@ -109,14 +110,14 @@ instance (ListLike List) where
   empty = '()
   cons = rkt:cons
 
-define-values [make-Eqq eq?]
+define-values [Eqq eq?]
   block
     class Eqq where
       eq?
-    values make-Eqq eq?
+    values Eqq eq?
 
 define EqqAny
-  make-Eqq rkt:eq?
+  Eqq rkt:eq?
 
 module+ test
   check-equal? ((f OrdNumber) 1 2) 1

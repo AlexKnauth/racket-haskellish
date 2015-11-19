@@ -3,8 +3,6 @@
 provide class instance define:
 
 require kw-make-struct
-        "multiple-inheritance-struct.rkt"
-        "multiple-inheritance-struct-make.rkt"
         for-syntax racket/base
                    point-free
                    racket/syntax
@@ -18,16 +16,16 @@ require kw-make-struct
      (for/list ([id (in-list (syntax->list #'[id ...]))])
        (format-id #'name "~a-~a" #'name id #:source #'id))
      #'(begin
-         (define-struct name (id ...))
+         (struct name (id ...))
          (define (id d) (name-id d))
          ...)]
-    [(class constraint-name:id ... (~datum =>) name:id (~datum where)
+    [(class constraint-name:id (~datum =>) name:id (~datum where)
        id:id ...)
      #:with [name-id ...]
      (for/list ([id (in-list (syntax->list #'[id ...]))])
        (format-id #'name "~a-~a" #'name id #:source #'id))
      #'(begin
-         (define-struct name #:extends [constraint-name ...] (id ...))
+         (struct name constraint-name (id ...))
          (define (id d) (name-id d))
          ...)]
     ))
@@ -35,11 +33,14 @@ require kw-make-struct
 (define-syntax instance
   (syntax-parser
     [(instance (class-name:id instance-name:id) (~datum where)
-       (~seq #:super [super-class-name super-instance-name])
-       ...
        [id:id (~datum =) impl:expr]
        ...)
-     #'(define instance-name (make class-name [#:super super-class-name super-instance-name] ... [id impl] ...))]
+     #:with [[kw/impl ...] ...]
+     (for/list ([id (in-list (syntax->list #'[id ...]))]
+                [impl (in-list (syntax->list #'[impl ...]))])
+       (list (datum->syntax id (~> id syntax-e symbol->string string->keyword) id id)
+             impl))
+     #'(define instance-name (make/kw class-name kw/impl ... ...))]
     ))
 
 (define-syntax define:
