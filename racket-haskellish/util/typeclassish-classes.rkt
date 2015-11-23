@@ -28,12 +28,10 @@ instance (Eq EqNumber) where
       (not ((== EqNumber) a b))
 
 instance (Ord OrdNumber) where
-  == = (== EqNumber)
-  /= = (/= EqNumber)
   compare =
     lambda (a b)
       cond
-        [((== OrdNumber) a b) 'EQ]
+        [((== EqNumber) a b) 'EQ]
         [(rkt:< a b) 'LT]
         [else 'GT]
 

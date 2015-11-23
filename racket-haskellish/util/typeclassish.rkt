@@ -25,7 +25,7 @@ require kw-make-struct
      (for/list ([id (in-list (syntax->list #'[id ...]))])
        (format-id #'name "~a-~a" #'name id #:source #'id))
      #'(begin
-         (struct name constraint-name (id ...))
+         (struct name (id ...))
          (define (id d) (name-id d))
          ...)]
     ))
